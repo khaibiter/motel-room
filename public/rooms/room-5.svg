@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" role="img" aria-label="Quiet studio room">
+  <rect width="640" height="480" fill="#f6f0ff"/>
+  <rect x="38" y="46" width="564" height="292" rx="22" fill="#fffdf7"/>
+  <rect x="82" y="82" width="178" height="168" rx="16" fill="#c7d2fe"/>
+  <path d="M171 82v168M82 166h178" stroke="#fff" stroke-width="10"/>
+  <rect x="374" y="94" width="132" height="210" rx="18" fill="#607166"/>
+  <rect x="116" y="286" width="286" height="72" rx="20" fill="#dff3e8"/>
+  <rect x="146" y="248" width="196" height="62" rx="18" fill="#ffffff"/>
+  <circle cx="492" cy="326" r="34" fill="#f6d87c"/>
+  <path d="M38 338h564v92c0 12-10 22-22 22H60c-12 0-22-10-22-22V338Z" fill="#a9794c"/>
+</svg>

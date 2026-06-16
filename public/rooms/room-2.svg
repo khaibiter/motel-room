@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" role="img" aria-label="Furnished studio room">
+  <rect width="640" height="480" fill="#eef7f1"/>
+  <rect x="42" y="48" width="556" height="284" rx="22" fill="#ffffff"/>
+  <rect x="70" y="78" width="196" height="156" rx="16" fill="#c9ebff"/>
+  <path d="M168 78v156M70 156h196" stroke="#fff" stroke-width="10"/>
+  <rect x="388" y="92" width="122" height="178" rx="16" fill="#f6d87c"/>
+  <rect x="108" y="272" width="246" height="82" rx="20" fill="#0f7a4d"/>
+  <rect x="138" y="232" width="170" height="68" rx="18" fill="#fff8e6"/>
+  <circle cx="470" cy="312" r="42" fill="#dff3e8"/>
+  <rect x="454" y="350" width="32" height="70" rx="16" fill="#095436"/>
+  <path d="M42 332h556v96c0 12-10 22-22 22H64c-12 0-22-10-22-22V332Z" fill="#9a7048"/>
+</svg>

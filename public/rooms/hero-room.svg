@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 680" role="img" aria-label="Modern rental room illustration">
+  <defs>
+    <linearGradient id="wall" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#fff8e6"/>
+      <stop offset="1" stop-color="#dff3e8"/>
+    </linearGradient>
+    <linearGradient id="floor" x1="0" x2="1">
+      <stop offset="0" stop-color="#c99a5b"/>
+      <stop offset="1" stop-color="#7a5737"/>
+    </linearGradient>
+  </defs>
+  <rect width="920" height="680" rx="42" fill="#f8faf5"/>
+  <rect x="58" y="48" width="804" height="438" rx="28" fill="url(#wall)"/>
+  <path d="M58 486h804v118c0 15-13 28-28 28H86c-15 0-28-13-28-28V486Z" fill="url(#floor)"/>
+  <rect x="112" y="102" width="210" height="188" rx="14" fill="#94d4ed"/>
+  <path d="M217 102v188M112 196h210" stroke="#fff" stroke-width="12"/>
+  <rect x="620" y="98" width="142" height="258" rx="16" fill="#0f7a4d"/>
+  <rect x="640" y="124" width="102" height="22" rx="11" fill="#bbf7d0"/>
+  <rect x="640" y="170" width="102" height="22" rx="11" fill="#bbf7d0"/>
+  <rect x="150" y="360" width="392" height="96" rx="22" fill="#f6d87c"/>
+  <rect x="178" y="314" width="310" height="92" rx="22" fill="#ffffff"/>
+  <rect x="194" y="332" width="104" height="46" rx="14" fill="#dff3e8"/>
+  <rect x="318" y="332" width="134" height="46" rx="14" fill="#dff3e8"/>
+  <rect x="150" y="442" width="392" height="28" rx="14" fill="#0f7a4d"/>
+  <rect x="570" y="404" width="162" height="54" rx="16" fill="#ffffff"/>
+  <rect x="604" y="356" width="94" height="54" rx="16" fill="#f6d87c"/>
+  <rect x="594" y="458" width="22" height="92" rx="10" fill="#5d4128"/>
+  <rect x="686" y="458" width="22" height="92" rx="10" fill="#5d4128"/>
+  <circle cx="768" cy="394" r="38" fill="#dff3e8"/>
+  <rect x="756" y="430" width="24" height="120" rx="12" fill="#0f7a4d"/>
+  <ellipse cx="768" cy="554" rx="58" ry="16" fill="#000" opacity=".12"/>
+</svg>

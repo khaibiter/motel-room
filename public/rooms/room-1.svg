@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" role="img" aria-label="Duplex room with balcony">
+  <rect width="640" height="480" fill="#f5f2e8"/>
+  <rect x="34" y="40" width="572" height="286" rx="20" fill="#fef9e8"/>
+  <rect x="72" y="72" width="172" height="170" rx="14" fill="#a5d8ff"/>
+  <path d="M158 72v170M72 154h172" stroke="#fff" stroke-width="10"/>
+  <rect x="392" y="70" width="122" height="230" rx="14" fill="#0f7a4d"/>
+  <path d="M392 182h122" stroke="#bbf7d0" stroke-width="12"/>
+  <rect x="96" y="282" width="318" height="74" rx="20" fill="#f6d87c"/>
+  <rect x="122" y="240" width="234" height="72" rx="18" fill="#fff"/>
+  <rect x="138" y="258" width="76" height="34" rx="10" fill="#dff3e8"/>
+  <rect x="228" y="258" width="94" height="34" rx="10" fill="#dff3e8"/>
+  <path d="M34 326h572v106c0 11-9 20-20 20H54c-11 0-20-9-20-20V326Z" fill="#b77942"/>
+</svg>
