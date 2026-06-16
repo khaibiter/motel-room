@@ -102,6 +102,22 @@ const filterGroups = {
   status: ["Tất cả", "Trống sẵn", "Sắp trống", "Đã thuê"],
 };
 
+const priceRanges = {
+  "4-10": [4, 10],
+  "4-6": [4, 6],
+  "6-8": [6, 8],
+  "8-10": [8, 10],
+};
+
+const quickFilters = [
+  { label: "Quận 7", group: "district", value: "Quận 7" },
+  { label: "Quận 4", group: "district", value: "Quận 4" },
+  { label: "Studio", group: "type", value: "Studio" },
+  { label: "Duplex", group: "type", value: "Duplex" },
+  { label: "Trống sẵn", group: "status", value: "Trống sẵn" },
+  { label: "Dưới 6 triệu", group: "price", value: "4-6" },
+];
+
 function formatPrice(price) {
   return Number.isInteger(price) ? `${price} triệu` : `${price.toFixed(1)} triệu`;
 }
@@ -124,8 +140,7 @@ function getDisplayLikes(listing, liked) {
 
 export default function HomePage() {
   const [keyword, setKeyword] = useState("");
-  const [minPrice, setMinPrice] = useState("4");
-  const [maxPrice, setMaxPrice] = useState("10");
+  const [priceRange, setPriceRange] = useState("4-10");
   const [sortBy, setSortBy] = useState("featured");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [quickContactVisible, setQuickContactVisible] = useState(false);
@@ -138,7 +153,7 @@ export default function HomePage() {
 
   useEffect(() => {
     function handleScroll() {
-      setQuickContactVisible(window.scrollY > 520);
+      setQuickContactVisible(window.scrollY > 1800);
     }
 
     handleScroll();
@@ -148,8 +163,7 @@ export default function HomePage() {
 
   const filteredListings = useMemo(() => {
     const normalizedKeyword = keyword.trim().toLowerCase();
-    const low = Math.min(Number(minPrice), Number(maxPrice));
-    const high = Math.max(Number(minPrice), Number(maxPrice));
+    const [low, high] = priceRanges[priceRange] ?? priceRanges["4-10"];
 
     const matched = listings.filter((listing) => {
       const haystack = `${listing.title} ${listing.district} ${listing.address} ${listing.desc} ${listing.type} ${listing.status}`.toLowerCase();
@@ -169,10 +183,30 @@ export default function HomePage() {
       if (sortBy === "likes-desc") return getDisplayLikes(b, liked[b.id]) - getDisplayLikes(a, liked[a.id]);
       return b.views + b.likes - (a.views + a.likes);
     });
-  }, [filters, keyword, liked, maxPrice, minPrice, sortBy]);
+  }, [filters, keyword, liked, priceRange, sortBy]);
 
   function updateFilter(group, value) {
     setFilters((current) => ({ ...current, [group]: value }));
+  }
+
+  function applyQuickFilter(filter) {
+    if (filter.group === "price") {
+      setPriceRange(filter.value);
+      return;
+    }
+
+    updateFilter(filter.group, filter.value);
+  }
+
+  function resetFilters() {
+    setKeyword("");
+    setPriceRange("4-10");
+    setFilters({
+      district: "Tất cả",
+      type: "Tất cả",
+      status: "Tất cả",
+    });
+    setSortBy("featured");
   }
 
   function submitSearch(event) {
@@ -283,16 +317,26 @@ export default function HomePage() {
 
         <section className="filter-band" id="filters" aria-label="Bộ lọc phòng trọ">
           <div className="filter-grid">
+            <div className="filter-head">
+              <div>
+                <h2>Tìm kiếm khu vực</h2>
+                <p>Chọn bộ lọc để xem nhanh các phòng phù hợp với nhu cầu.</p>
+              </div>
+              <button className="reset-button" type="button" onClick={resetFilters}>
+                Đặt lại bộ lọc
+              </button>
+            </div>
+
             <form className="search-panel" onSubmit={submitSearch}>
               <div className="field field-wide">
-                <label htmlFor="keyword">Tìm kiếm khu vực</label>
+                <label htmlFor="keyword">Khu vực / từ khóa</label>
                 <div className="input-icon">
                   <Icon name="search" />
                   <input
                     id="keyword"
                     name="keyword"
                     type="search"
-                    placeholder="Nhập tên đường, quận, tiện ích gần đó"
+                    placeholder="Ví dụ: Nguyễn Thị Thập, Lotte, Him Lam"
                     autoComplete="off"
                     value={keyword}
                     onChange={(event) => setKeyword(event.target.value)}
@@ -301,52 +345,60 @@ export default function HomePage() {
               </div>
 
               <div className="field">
-                <label htmlFor="minPrice">Giá từ</label>
-                <select id="minPrice" value={minPrice} onChange={(event) => setMinPrice(event.target.value)}>
-                  <option value="4">4 triệu</option>
-                  <option value="5">5 triệu</option>
-                  <option value="6">6 triệu</option>
-                  <option value="7">7 triệu</option>
+                <label htmlFor="priceRange">Giá tiền</label>
+                <select id="priceRange" value={priceRange} onChange={(event) => setPriceRange(event.target.value)}>
+                  <option value="4-10">4 - 10 triệu</option>
+                  <option value="4-6">Dưới 6 triệu</option>
+                  <option value="6-8">6 - 8 triệu</option>
+                  <option value="8-10">8 - 10 triệu</option>
                 </select>
               </div>
 
               <div className="field">
-                <label htmlFor="maxPrice">Đến</label>
-                <select id="maxPrice" value={maxPrice} onChange={(event) => setMaxPrice(event.target.value)}>
-                  <option value="10">10 triệu</option>
-                  <option value="9">9 triệu</option>
-                  <option value="8">8 triệu</option>
-                  <option value="7">7 triệu</option>
+                <label htmlFor="district">Quận / khu</label>
+                <select id="district" value={filters.district} onChange={(event) => updateFilter("district", event.target.value)}>
+                  {filterGroups.district.map((value) => (
+                    <option key={value} value={value}>
+                      {value}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="field">
+                <label htmlFor="roomType">Dạng phòng</label>
+                <select id="roomType" value={filters.type} onChange={(event) => updateFilter("type", event.target.value)}>
+                  {filterGroups.type.map((value) => (
+                    <option key={value} value={value}>
+                      {value}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="field">
+                <label htmlFor="roomStatus">Trạng thái</label>
+                <select id="roomStatus" value={filters.status} onChange={(event) => updateFilter("status", event.target.value)}>
+                  {filterGroups.status.map((value) => (
+                    <option key={value} value={value}>
+                      {value}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               <button className="search-button" type="submit">
-                <Icon name="sliders" />
-                Lọc phòng
+                Tìm phòng
               </button>
             </form>
 
-            <FilterGroup
-              title="Quận / khu vực"
-              group="district"
-              values={filterGroups.district}
-              selected={filters.district}
-              onChange={updateFilter}
-            />
-            <FilterGroup
-              title="Dạng phòng"
-              group="type"
-              values={filterGroups.type}
-              selected={filters.type}
-              onChange={updateFilter}
-            />
-            <FilterGroup
-              title="Tình trạng"
-              group="status"
-              values={filterGroups.status}
-              selected={filters.status}
-              onChange={updateFilter}
-            />
+            <div className="quick-chip-row" aria-label="Bộ lọc nhanh">
+              {quickFilters.map((filter) => (
+                <button className="quick-chip" key={`${filter.group}-${filter.value}`} type="button" onClick={() => applyQuickFilter(filter)}>
+                  {filter.label}
+                </button>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -368,17 +420,16 @@ export default function HomePage() {
         <section className="listings-section" id="listings">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">Bài đăng nổi bật</p>
-              <h2>Phòng phù hợp đang được quan tâm</h2>
+              <h2>Phòng trọ nổi bật</h2>
+              <p className="result-count" aria-live="polite">
+                Đang hiển thị {filteredListings.length} phòng phù hợp.
+              </p>
             </div>
             <div className="listing-tools">
-              <p className="result-count" aria-live="polite">
-                {filteredListings.length} phòng phù hợp
-              </p>
               <label className="sort-field" htmlFor="sortBy">
                 <span>Sắp xếp</span>
                 <select id="sortBy" value={sortBy} onChange={(event) => setSortBy(event.target.value)}>
-                  <option value="featured">Nổi bật</option>
+                  <option value="featured">Mặc định</option>
                   <option value="price-asc">Giá thấp đến cao</option>
                   <option value="price-desc">Giá cao đến thấp</option>
                   <option value="views-desc">Lượt xem nhiều</option>
@@ -440,26 +491,6 @@ export default function HomePage() {
         <p>© 2026 timphongtrocungtoi.vn - Khải hỗ trợ tìm phòng trọ khu Nam Sài Gòn.</p>
       </footer>
     </>
-  );
-}
-
-function FilterGroup({ title, group, values, selected, onChange }) {
-  return (
-    <div className="filter-group">
-      <span className="filter-title">{title}</span>
-      <div className="chip-row">
-        {values.map((value) => (
-          <button
-            className={`chip ${selected === value ? "is-active" : ""}`}
-            key={value}
-            type="button"
-            onClick={() => onChange(group, value)}
-          >
-            {value}
-          </button>
-        ))}
-      </div>
-    </div>
   );
 }
 
