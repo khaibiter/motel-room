@@ -18,6 +18,7 @@ const listings = [
     status: "Trống sẵn",
     price: 8.5,
     area: "32m²",
+    furniture: "Cơ bản",
     address: "Đường Tôn Đản, Quận 4",
     desc: "Gác cao thoáng, cửa sổ lớn, nội thất cơ bản, di chuyển nhanh sang Quận 1.",
     views: 128,
@@ -32,6 +33,7 @@ const listings = [
     status: "Sắp trống",
     price: 7.2,
     area: "28m²",
+    furniture: "Full nội thất",
     address: "Đường Nguyễn Thị Thập, Quận 7",
     desc: "Có bếp riêng, máy giặt chung, hầm xe rộng, phù hợp người đi làm.",
     views: 96,
@@ -46,6 +48,7 @@ const listings = [
     status: "Trống sẵn",
     price: 5.8,
     area: "24m²",
+    furniture: "Cơ bản",
     address: "Đường Phạm Hùng, Quận 8",
     desc: "Phòng sáng, có thang máy, giờ giấc tự do, gần siêu thị và trạm xe buýt.",
     views: 211,
@@ -60,6 +63,7 @@ const listings = [
     status: "Trống sẵn",
     price: 9.6,
     area: "38m²",
+    furniture: "Máy lạnh, tủ, bếp",
     address: "Đường Nguyễn Hữu Thọ, Nhà Bè",
     desc: "Không gian rộng, có ban công, máy lạnh, tủ bếp, thuận tiện đi Quận 7.",
     views: 174,
@@ -74,6 +78,7 @@ const listings = [
     status: "Đã thuê",
     price: 6.4,
     area: "25m²",
+    furniture: "Nội thất gọn",
     address: "Đường Khánh Hội, Quận 4",
     desc: "Khu an ninh, nội thất gọn, phù hợp một người hoặc cặp đôi.",
     views: 83,
@@ -88,6 +93,7 @@ const listings = [
     status: "Sắp trống",
     price: 10,
     area: "40m²",
+    furniture: "Cao cấp",
     address: "Đường D1 Him Lam, Quận 7",
     desc: "Thiết kế hiện đại, bếp tách mùi, gần Crescent Mall và khu văn phòng.",
     views: 245,
@@ -501,35 +507,57 @@ function ListingCard({ listing, liked, onLike }) {
     <article className="listing-card">
       <div className="listing-photo">
         <img src={listing.image} alt={listing.title} loading="lazy" />
+        <span className="type-badge">{listing.type}</span>
         <span className={`status-badge ${statusClass(listing.status)}`}>{listing.status}</span>
+        <div className="photo-stats">
+          <span>
+            <Icon name="eye" />
+            {listing.views.toLocaleString("vi-VN")} lượt xem
+          </span>
+          <span>
+            <Icon name="heart" />
+            {likes}
+          </span>
+        </div>
       </div>
       <div className="card-body">
-        <div className="listing-meta">
+        <div className="listing-title-row">
+          <h3 className="listing-title">{listing.title}</h3>
+          <span className="price">{formatPrice(listing.price).replace(" triệu", "tr")}</span>
+        </div>
+
+        <div className="listing-address">
           <span>
             <Icon name="pin" />
-            {listing.district}
-          </span>
-          <span>
-            <Icon name="ruler" />
-            {listing.area}
-          </span>
-        </div>
-        <h3 className="listing-title">{listing.title}</h3>
-        <p className="listing-desc">{listing.desc}</p>
-        <div className="price-row">
-          <span className="price">{formatPrice(listing.price)}</span>
-          <span className="room-type">{listing.type}</span>
-        </div>
-        <div className="listing-meta">
-          <span>
-            <Icon name="navigation" />
             {listing.address}
           </span>
         </div>
+
+        <div className="spec-grid">
+          <div>
+            <span>Diện tích</span>
+            <strong>{listing.area}</strong>
+          </div>
+          <div>
+            <span>Nội thất</span>
+            <strong>{listing.furniture}</strong>
+          </div>
+          <div>
+            <span>Dạng phòng</span>
+            <strong>{listing.type}</strong>
+          </div>
+          <div>
+            <span>Trạng thái</span>
+            <strong>{listing.status}</strong>
+          </div>
+        </div>
+
+        <p className="listing-desc">{listing.desc}</p>
+
         <div className="stats-row">
           <span className="stat">
             <Icon name="eye" />
-            {listing.views}
+            {listing.views.toLocaleString("vi-VN")}
           </span>
           <span className="stat">
             <Icon name="heart" />
