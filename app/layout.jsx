@@ -12,6 +12,9 @@ export const metadata = {
   description:
     "Tìm phòng trọ Duplex, Studio khu vực Quận 4, 7, 8, Nhà Bè với mức giá 4 đến 10 triệu. Liên hệ Khải qua Zalo hoặc Facebook.",
   metadataBase: new URL("http://timphongtrocungtoi.vn"),
+  icons: {
+    icon: "/favicon.svg",
+  },
   openGraph: {
     title: "Tìm Phòng Trọ Cùng Tôi",
     description: "Lọc phòng theo khu vực, giá, dạng phòng và tình trạng trống.",
