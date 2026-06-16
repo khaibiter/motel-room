@@ -189,10 +189,12 @@ export default function HomePage() {
       <header className="site-header">
         <nav className="nav-shell" aria-label="Thanh điều hướng chính">
           <a className="brand" href="#" aria-label="Tìm Phòng Trọ Cùng Tôi" onClick={closeMobileMenu}>
-            <span className="brand-mark">TP</span>
-            <span>
+            <span className="brand-mark">
+              <Icon name="home" />
+            </span>
+            <span className="brand-copy">
               <strong>Tìm Phòng Trọ Cùng Tôi</strong>
-              <small>timphongtrocungtoi.vn</small>
+              <small>Tư vấn phòng bởi Khải</small>
             </span>
           </a>
 
@@ -207,33 +209,80 @@ export default function HomePage() {
           </button>
 
           <div className={`nav-actions ${mobileMenuOpen ? "is-open" : ""}`}>
-            <a className="ghost-link" href="#filters" onClick={closeMobileMenu}>
-              Bộ lọc
+            <a className="nav-link" href="#filters" onClick={closeMobileMenu}>
+              Tìm kiếm
             </a>
-            <a className="ghost-link" href="#listings" onClick={closeMobileMenu}>
-              Bài đăng
+            <a className="nav-link" href="#listings" onClick={closeMobileMenu}>
+              Phòng nổi bật
             </a>
-            <a className="primary-link" href={`tel:${CONTACT.phone}`} onClick={closeMobileMenu}>
+            <a className="nav-link" href="#contact" onClick={closeMobileMenu}>
+              Liên hệ
+            </a>
+          </div>
+
+          <div className="nav-cta">
+            <a className="outline-link" href={`tel:${CONTACT.phone}`} onClick={closeMobileMenu}>
               <Icon name="phone" />
               Gọi Khải
             </a>
+            <a className="primary-link" href={CONTACT.zalo} target="_blank" rel="noopener noreferrer" onClick={closeMobileMenu}>
+              Nhắn Zalo
+            </a>
           </div>
         </nav>
+        <div className="sub-nav" aria-label="Liên kết nhanh">
+          <a href="#filters">Tìm kiếm phòng</a>
+          <a href="#listings">Danh sách phòng</a>
+          <a href="#contact">Liên hệ Khải</a>
+        </div>
       </header>
 
       <main>
         <section className="hero">
-          <div className="hero-media" aria-hidden="true">
-            <img src="/rooms/hero-room.svg" alt="" />
-          </div>
-          <div className="hero-content">
-            <p className="eyebrow">Phòng trọ thật, tư vấn nhanh, khu Nam Sài Gòn</p>
-            <h1>Tìm phòng Duplex hoặc Studio đúng ngân sách của bạn</h1>
-            <p className="hero-copy">
-              Lọc phòng theo khu vực, giá 4-10 triệu, tình trạng trống sẵn hoặc sắp trống.
-              Khải hỗ trợ tư vấn qua Zalo, Facebook và điện thoại.
-            </p>
+          <div className="hero-inner">
+            <div className="hero-content">
+              <h1>
+                Tìm phòng trọ đẹp, đúng nhu cầu, <span>dễ chốt lịch xem</span>
+              </h1>
+              <p className="hero-copy">
+                Lọc phòng theo khu vực Quận 4, Quận 7, Quận 8, Nhà Bè; ngân sách 4 - 10 triệu;
+                dạng phòng Duplex hoặc Studio; trạng thái trống sẵn hoặc đã thuê và sắp trống.
+              </p>
 
+              <div className="hero-actions">
+                <a className="hero-button primary" href="#filters">
+                  Tìm phòng ngay
+                </a>
+                <a className="hero-button blue" href={CONTACT.zalo} target="_blank" rel="noopener noreferrer">
+                  Nhắn Zalo Khải
+                </a>
+                <a className="hero-button light" href={`tel:${CONTACT.phone}`}>
+                  Gọi 0812 333 067
+                </a>
+              </div>
+
+              <div className="hero-stats" aria-label="Thông tin nổi bật">
+                <div>
+                  <strong>4 - 10tr</strong>
+                  <span>Ngân sách phổ biến</span>
+                </div>
+                <div>
+                  <strong>4 khu vực</strong>
+                  <span>Q4, Q7, Q8, Nhà Bè</span>
+                </div>
+                <div>
+                  <strong>2 kiểu phòng</strong>
+                  <span>Duplex và Studio</span>
+                </div>
+              </div>
+            </div>
+
+            <HeroListingPreview />
+          </div>
+        </section>
+
+        <section className="filter-band" id="filters" aria-label="Bộ lọc phòng trọ">
+          <div className="filter-grid">
             <form className="search-panel" onSubmit={submitSearch}>
               <div className="field field-wide">
                 <label htmlFor="keyword">Tìm kiếm khu vực</label>
@@ -276,11 +325,7 @@ export default function HomePage() {
                 Lọc phòng
               </button>
             </form>
-          </div>
-        </section>
 
-        <section className="filter-band" id="filters" aria-label="Bộ lọc phòng trọ">
-          <div className="filter-grid">
             <FilterGroup
               title="Quận / khu vực"
               group="district"
@@ -363,7 +408,7 @@ export default function HomePage() {
           )}
         </section>
 
-        <section className="contact-section" aria-label="Liên hệ tư vấn">
+        <section className="contact-section" id="contact" aria-label="Liên hệ tư vấn">
           <div className="contact-copy">
             <p className="eyebrow">Tư vấn miễn phí</p>
             <h2>Cần xem phòng hoặc giữ chỗ?</h2>
@@ -506,6 +551,37 @@ function MobileContactBar() {
         Facebook
       </a>
     </div>
+  );
+}
+
+function HeroListingPreview() {
+  return (
+    <aside className="hero-preview" aria-label="Phòng gợi ý nổi bật">
+      <div className="floating-badge">Phòng mới cập nhật</div>
+      <div className="preview-frame">
+        <div className="preview-image">
+          <img src="/rooms/room-2.svg" alt="Studio full nội thất, ban công thoáng" />
+        </div>
+        <div className="preview-body">
+          <div className="preview-title-row">
+            <h2>Studio full nội thất, ban công thoáng</h2>
+            <strong>6,5tr</strong>
+          </div>
+          <p>
+            <Icon name="pin" />
+            Quận 7 - gần Nguyễn Thị Thập
+          </p>
+          <p>
+            <Icon name="eye" />
+            1.248 lượt xem · 86 yêu thích
+          </p>
+          <p>
+            <Icon name="home" />
+            Trống sẵn · Có thể xem phòng trong ngày
+          </p>
+        </div>
+      </div>
+    </aside>
   );
 }
 
