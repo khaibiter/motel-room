@@ -8,18 +8,18 @@ const beVietnam = Be_Vietnam_Pro({
 });
 
 export const metadata = {
-  title: "Tìm Phòng Trọ Cùng Tôi | Khải",
+  title: "Findrooms | Khải",
   description:
-    "Tìm phòng trọ Duplex, Studio khu vực Quận 4, 7, 8, Nhà Bè với mức giá 4 đến 10 triệu. Liên hệ Khải qua Zalo hoặc Facebook.",
-  metadataBase: new URL("http://timphongtrocungtoi.vn"),
+    "Find rental rooms, Duplex units, and Studio rooms in District 4, District 7, District 8, and Nhà Bè from 4 to 10 million VND. Contact Khải via Zalo or Facebook.",
+  metadataBase: new URL("http://findrooms.vn"),
   icons: {
     icon: "/favicon.svg",
   },
   openGraph: {
-    title: "Tìm Phòng Trọ Cùng Tôi",
-    description: "Lọc phòng theo khu vực, giá, dạng phòng và tình trạng trống.",
-    url: "http://timphongtrocungtoi.vn",
-    siteName: "Tìm Phòng Trọ Cùng Tôi",
+    title: "Findrooms",
+    description: "Filter rental rooms by location, price, room type, and availability.",
+    url: "http://findrooms.vn",
+    siteName: "Findrooms",
     locale: "vi_VN",
     type: "website",
   },

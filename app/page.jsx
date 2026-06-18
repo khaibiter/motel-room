@@ -228,12 +228,12 @@ export default function HomePage() {
     <>
       <header className="site-header">
         <nav className="nav-shell" aria-label="Thanh điều hướng chính">
-          <a className="brand" href="#" aria-label="Tìm Phòng Trọ Cùng Tôi" onClick={closeMobileMenu}>
+          <a className="brand" href="#" aria-label="Findrooms" onClick={closeMobileMenu}>
             <span className="brand-mark">
               <Icon name="home" />
             </span>
             <span className="brand-copy">
-              <strong>Tìm Phòng Trọ Cùng Tôi</strong>
+              <strong>Findrooms</strong>
               <small>Tư vấn phòng bởi Khải</small>
             </span>
           </a>
@@ -494,7 +494,7 @@ export default function HomePage() {
       {quickContactVisible ? <MobileContactBar /> : null}
 
       <footer className="footer">
-        <p>© 2026 timphongtrocungtoi.vn - Khải hỗ trợ tìm phòng trọ khu Nam Sài Gòn.</p>
+        <p>© 2026 findrooms.vn - Khải hỗ trợ tìm phòng trọ khu Nam Sài Gòn.</p>
       </footer>
     </>
   );
