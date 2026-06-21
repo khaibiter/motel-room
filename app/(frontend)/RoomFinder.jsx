@@ -1,35 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-
-const CONTACT = {
-  name: "Khải",
-  phone: "0812333067",
-  zalo: "https://zalo.me/0812333067",
-  facebook: "https://www.facebook.com/search/top?q=0812333067",
-};
+import { normalizeSiteContent } from "../../lib/siteContent";
 
 const filterGroups = {
   district: ["Tất cả", "Quận 4", "Quận 7", "Quận 8", "Nhà Bè"],
   type: ["Tất cả", "Duplex", "Studio"],
   status: ["Tất cả", "Trống sẵn", "Sắp trống", "Đã thuê"],
 };
-
-const priceRanges = {
-  "4-10": [4, 10],
-  "4-6": [4, 6],
-  "6-8": [6, 8],
-  "8-10": [8, 10],
-};
-
-const quickFilters = [
-  { label: "Quận 7", group: "district", value: "Quận 7" },
-  { label: "Quận 4", group: "district", value: "Quận 4" },
-  { label: "Studio", group: "type", value: "Studio" },
-  { label: "Duplex", group: "type", value: "Duplex" },
-  { label: "Trống sẵn", group: "status", value: "Trống sẵn" },
-  { label: "Dưới 6 triệu", group: "price", value: "4-6" },
-];
 
 function formatPrice(price) {
   return Number.isInteger(price) ? `${price} triệu` : `${price.toFixed(1)} triệu`;
@@ -41,9 +19,9 @@ function statusClass(status) {
   return "status-rented";
 }
 
-function contactMessage(listing) {
+function contactMessage(listing, contact) {
   return encodeURIComponent(
-    `Chào Khải, mình muốn được tư vấn phòng "${listing.title}" ở ${listing.district}, giá ${formatPrice(listing.price)}.`
+    `Chào ${contact.name}, mình muốn được tư vấn phòng "${listing.title}" ở ${listing.district}, giá ${formatPrice(listing.price)}.`
   );
 }
 
@@ -51,10 +29,18 @@ function getDisplayLikes(listing, liked) {
   return listing.likes + (liked ? 1 : 0);
 }
 
-export default function RoomFinder({ listings }) {
+function getPriceRangeMap(ranges) {
+  return Object.fromEntries(ranges.map((range) => [range.value, [Number(range.low), Number(range.high)]]));
+}
+
+export default function RoomFinder({ content, listings }) {
+  const pageContent = useMemo(() => normalizeSiteContent(content), [content]);
+  const contact = pageContent.contact;
+  const priceRanges = useMemo(() => getPriceRangeMap(pageContent.filters.priceRanges), [pageContent.filters.priceRanges]);
+  const defaultPriceRange = pageContent.filters.priceRanges[0]?.value ?? "4-10";
   const listingItems = useMemo(() => (Array.isArray(listings) ? listings : []), [listings]);
   const [keyword, setKeyword] = useState("");
-  const [priceRange, setPriceRange] = useState("4-10");
+  const [priceRange, setPriceRange] = useState(defaultPriceRange);
   const [sortBy, setSortBy] = useState("featured");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [quickContactVisible, setQuickContactVisible] = useState(false);
@@ -77,7 +63,7 @@ export default function RoomFinder({ listings }) {
 
   const filteredListings = useMemo(() => {
     const normalizedKeyword = keyword.trim().toLowerCase();
-    const [low, high] = priceRanges[priceRange] ?? priceRanges["4-10"];
+    const [low, high] = priceRanges[priceRange] ?? priceRanges[defaultPriceRange];
 
     const matched = listingItems.filter((listing) => {
       const haystack = `${listing.title} ${listing.district} ${listing.address} ${listing.desc} ${listing.type} ${listing.status}`.toLowerCase();
@@ -97,7 +83,7 @@ export default function RoomFinder({ listings }) {
       if (sortBy === "likes-desc") return getDisplayLikes(b, liked[b.id]) - getDisplayLikes(a, liked[a.id]);
       return b.views + b.likes - (a.views + a.likes);
     });
-  }, [filters, keyword, liked, listingItems, priceRange, sortBy]);
+  }, [defaultPriceRange, filters, keyword, liked, listingItems, priceRange, priceRanges, sortBy]);
 
   function updateFilter(group, value) {
     setFilters((current) => ({ ...current, [group]: value }));
@@ -114,7 +100,7 @@ export default function RoomFinder({ listings }) {
 
   function resetFilters() {
     setKeyword("");
-    setPriceRange("4-10");
+    setPriceRange(defaultPriceRange);
     setFilters({
       district: "Tất cả",
       type: "Tất cả",
@@ -136,13 +122,13 @@ export default function RoomFinder({ listings }) {
     <>
       <header className="site-header">
         <nav className="nav-shell" aria-label="Thanh điều hướng chính">
-          <a className="brand" href="#" aria-label="Findrooms" onClick={closeMobileMenu}>
+          <a className="brand" href="#" aria-label={pageContent.brand.name} onClick={closeMobileMenu}>
             <span className="brand-mark">
               <Icon name="home" />
             </span>
             <span className="brand-copy">
-              <strong>Findrooms</strong>
-              <small>Tư vấn phòng bởi Khải</small>
+              <strong>{pageContent.brand.name}</strong>
+              <small>{pageContent.brand.tagline}</small>
             </span>
           </a>
 
@@ -157,31 +143,29 @@ export default function RoomFinder({ listings }) {
           </button>
 
           <div className={`nav-actions ${mobileMenuOpen ? "is-open" : ""}`}>
-            <a className="nav-link" href="#filters" onClick={closeMobileMenu}>
-              Tìm kiếm
-            </a>
-            <a className="nav-link" href="#listings" onClick={closeMobileMenu}>
-              Phòng nổi bật
-            </a>
-            <a className="nav-link" href="#contact" onClick={closeMobileMenu}>
-              Liên hệ
-            </a>
+            {pageContent.navigation.map((item) => (
+              <a className="nav-link" href={item.href} key={`${item.href}-${item.label}`} onClick={closeMobileMenu}>
+                {item.label}
+              </a>
+            ))}
           </div>
 
           <div className="nav-cta">
-            <a className="outline-link" href={`tel:${CONTACT.phone}`} onClick={closeMobileMenu}>
+            <a className="outline-link" href={`tel:${contact.phone}`} onClick={closeMobileMenu}>
               <Icon name="phone" />
-              Gọi Khải
+              {pageContent.header.callLabel}
             </a>
-            <a className="primary-link" href={CONTACT.zalo} target="_blank" rel="noopener noreferrer" onClick={closeMobileMenu}>
-              Nhắn Zalo
+            <a className="primary-link" href={contact.zalo} target="_blank" rel="noopener noreferrer" onClick={closeMobileMenu}>
+              {pageContent.header.zaloLabel}
             </a>
           </div>
         </nav>
         <div className="sub-nav" aria-label="Liên kết nhanh">
-          <a href="#filters">Tìm kiếm phòng</a>
-          <a href="#listings">Danh sách phòng</a>
-          <a href="#contact">Liên hệ Khải</a>
+          {pageContent.subNavigation.map((item) => (
+            <a href={item.href} key={`${item.href}-${item.label}`}>
+              {item.label}
+            </a>
+          ))}
         </div>
       </header>
 
@@ -190,42 +174,33 @@ export default function RoomFinder({ listings }) {
           <div className="hero-inner">
             <div className="hero-content">
               <h1>
-                Tìm phòng trọ đẹp, đúng nhu cầu, <span>dễ chốt lịch xem</span>
+                {pageContent.hero.title} <span>{pageContent.hero.highlightedTitle}</span>
               </h1>
-              <p className="hero-copy">
-                Lọc phòng theo khu vực Quận 4, Quận 7, Quận 8, Nhà Bè; ngân sách 4 - 10 triệu;
-                dạng phòng Duplex hoặc Studio; trạng thái trống sẵn hoặc đã thuê và sắp trống.
-              </p>
+              <p className="hero-copy">{pageContent.hero.copy}</p>
 
               <div className="hero-actions">
                 <a className="hero-button primary" href="#filters">
-                  Tìm phòng ngay
+                  {pageContent.hero.primaryLabel}
                 </a>
-                <a className="hero-button blue" href={CONTACT.zalo} target="_blank" rel="noopener noreferrer">
-                  Nhắn Zalo Khải
+                <a className="hero-button blue" href={contact.zalo} target="_blank" rel="noopener noreferrer">
+                  {pageContent.hero.secondaryLabel}
                 </a>
-                <a className="hero-button light" href={`tel:${CONTACT.phone}`}>
-                  Gọi 0812 333 067
+                <a className="hero-button light" href={`tel:${contact.phone}`}>
+                  {pageContent.hero.phoneLabel}
                 </a>
               </div>
 
               <div className="hero-stats" aria-label="Thông tin nổi bật">
-                <div>
-                  <strong>4 - 10tr</strong>
-                  <span>Ngân sách phổ biến</span>
-                </div>
-                <div>
-                  <strong>4 khu vực</strong>
-                  <span>Q4, Q7, Q8, Nhà Bè</span>
-                </div>
-                <div>
-                  <strong>2 kiểu phòng</strong>
-                  <span>Duplex và Studio</span>
-                </div>
+                {pageContent.hero.stats.map((stat) => (
+                  <div key={`${stat.value}-${stat.label}`}>
+                    <strong>{stat.value}</strong>
+                    <span>{stat.label}</span>
+                  </div>
+                ))}
               </div>
             </div>
 
-            <HeroListingPreview />
+            <HeroListingPreview preview={pageContent.preview} />
           </div>
         </section>
 
@@ -233,24 +208,24 @@ export default function RoomFinder({ listings }) {
           <div className="filter-grid">
             <div className="filter-head">
               <div>
-                <h2>Tìm kiếm khu vực</h2>
-                <p>Chọn bộ lọc để xem nhanh các phòng phù hợp với nhu cầu.</p>
+                <h2>{pageContent.filters.title}</h2>
+                <p>{pageContent.filters.copy}</p>
               </div>
               <button className="reset-button" type="button" onClick={resetFilters}>
-                Đặt lại bộ lọc
+                {pageContent.filters.resetLabel}
               </button>
             </div>
 
             <form className="search-panel" onSubmit={submitSearch}>
               <div className="field field-wide">
-                <label htmlFor="keyword">Khu vực / từ khóa</label>
+                <label htmlFor="keyword">{pageContent.filters.keywordLabel}</label>
                 <div className="input-icon">
                   <Icon name="search" />
                   <input
                     id="keyword"
                     name="keyword"
                     type="search"
-                    placeholder="Ví dụ: Nguyễn Thị Thập, Lotte, Him Lam"
+                    placeholder={pageContent.filters.keywordPlaceholder}
                     autoComplete="off"
                     value={keyword}
                     onChange={(event) => setKeyword(event.target.value)}
@@ -259,17 +234,18 @@ export default function RoomFinder({ listings }) {
               </div>
 
               <div className="field">
-                <label htmlFor="priceRange">Giá tiền</label>
+                <label htmlFor="priceRange">{pageContent.filters.priceLabel}</label>
                 <select id="priceRange" value={priceRange} onChange={(event) => setPriceRange(event.target.value)}>
-                  <option value="4-10">4 - 10 triệu</option>
-                  <option value="4-6">Dưới 6 triệu</option>
-                  <option value="6-8">6 - 8 triệu</option>
-                  <option value="8-10">8 - 10 triệu</option>
+                  {pageContent.filters.priceRanges.map((range) => (
+                    <option key={range.value} value={range.value}>
+                      {range.label}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               <div className="field">
-                <label htmlFor="district">Quận / khu</label>
+                <label htmlFor="district">{pageContent.filters.districtLabel}</label>
                 <select id="district" value={filters.district} onChange={(event) => updateFilter("district", event.target.value)}>
                   {filterGroups.district.map((value) => (
                     <option key={value} value={value}>
@@ -280,7 +256,7 @@ export default function RoomFinder({ listings }) {
               </div>
 
               <div className="field">
-                <label htmlFor="roomType">Dạng phòng</label>
+                <label htmlFor="roomType">{pageContent.filters.typeLabel}</label>
                 <select id="roomType" value={filters.type} onChange={(event) => updateFilter("type", event.target.value)}>
                   {filterGroups.type.map((value) => (
                     <option key={value} value={value}>
@@ -291,7 +267,7 @@ export default function RoomFinder({ listings }) {
               </div>
 
               <div className="field">
-                <label htmlFor="roomStatus">Trạng thái</label>
+                <label htmlFor="roomStatus">{pageContent.filters.statusLabel}</label>
                 <select id="roomStatus" value={filters.status} onChange={(event) => updateFilter("status", event.target.value)}>
                   {filterGroups.status.map((value) => (
                     <option key={value} value={value}>
@@ -302,12 +278,12 @@ export default function RoomFinder({ listings }) {
               </div>
 
               <button className="search-button" type="submit">
-                Tìm phòng
+                {pageContent.filters.searchLabel}
               </button>
             </form>
 
-            <div className="quick-chip-row" aria-label="Bộ lọc nhanh">
-              {quickFilters.map((filter) => (
+            <div className="quick-chip-row" aria-label={pageContent.filters.quickFiltersLabel}>
+              {pageContent.filters.quickFilters.map((filter) => (
                 <button className="quick-chip" key={`${filter.group}-${filter.value}`} type="button" onClick={() => applyQuickFilter(filter)}>
                   {filter.label}
                 </button>
@@ -317,31 +293,25 @@ export default function RoomFinder({ listings }) {
         </section>
 
         <section className="trust-strip" aria-label="Thông tin hỗ trợ">
-          <div>
-            <strong>4-10 triệu</strong>
-            <span>Ngân sách phổ biến</span>
-          </div>
-          <div>
-            <strong>4 khu vực</strong>
-            <span>Quận 4, 7, 8, Nhà Bè</span>
-          </div>
-          <div>
-            <strong>Zalo 0812333067</strong>
-            <span>Khải tư vấn trực tiếp</span>
-          </div>
+          {pageContent.trustStrip.map((stat) => (
+            <div key={`${stat.value}-${stat.label}`}>
+              <strong>{stat.value}</strong>
+              <span>{stat.label}</span>
+            </div>
+          ))}
         </section>
 
         <section className="listings-section" id="listings">
           <div className="section-heading">
             <div>
-              <h2>Phòng trọ nổi bật</h2>
+              <h2>{pageContent.listings.title}</h2>
               <p className="result-count" aria-live="polite">
-                Đang hiển thị {filteredListings.length} phòng phù hợp.
+                {pageContent.listings.resultPrefix} {filteredListings.length} {pageContent.listings.resultSuffix}
               </p>
             </div>
             <div className="listing-tools">
               <label className="sort-field" htmlFor="sortBy">
-                <span>Sắp xếp</span>
+                <span>{pageContent.listings.sortLabel}</span>
                 <select id="sortBy" value={sortBy} onChange={(event) => setSortBy(event.target.value)}>
                   <option value="featured">Mặc định</option>
                   <option value="price-asc">Giá thấp đến cao</option>
@@ -360,6 +330,7 @@ export default function RoomFinder({ listings }) {
                   key={listing.id}
                   listing={listing}
                   liked={Boolean(liked[listing.id])}
+                  content={pageContent}
                   onLike={() => setLiked((current) => ({ ...current, [listing.id]: true }))}
                 />
               ))}
@@ -367,48 +338,46 @@ export default function RoomFinder({ listings }) {
           ) : (
             <div className="empty-state">
               <Icon name="home" />
-              <h3>Chưa có phòng khớp bộ lọc</h3>
-              <p>Hãy thử đổi khu vực, dạng phòng hoặc khoảng giá để xem thêm lựa chọn.</p>
+              <h3>{pageContent.listings.emptyTitle}</h3>
+              <p>{pageContent.listings.emptyCopy}</p>
             </div>
           )}
         </section>
 
         <section className="contact-section" id="contact" aria-label="Liên hệ tư vấn">
           <div className="contact-copy">
-            <p className="eyebrow">Tư vấn miễn phí</p>
-            <h2>Cần xem phòng hoặc giữ chỗ?</h2>
-            <p>
-              Nhắn Khải thông tin khu vực, ngân sách và ngày muốn dọn vào. Mình sẽ gửi phòng
-              còn phù hợp, video thực tế và hỗ trợ lịch xem.
-            </p>
+            <p className="eyebrow">{pageContent.contactSection.eyebrow}</p>
+            <h2>{pageContent.contactSection.title}</h2>
+            <p>{pageContent.contactSection.copy}</p>
           </div>
           <div className="contact-actions">
-            <a className="contact-button zalo" href={CONTACT.zalo} target="_blank" rel="noopener noreferrer">
+            <a className="contact-button zalo" href={contact.zalo} target="_blank" rel="noopener noreferrer">
               <Icon name="message" />
-              Nhắn Zalo
+              {pageContent.contactSection.zaloLabel}
             </a>
-            <a className="contact-button facebook" href={CONTACT.facebook} target="_blank" rel="noopener noreferrer">
+            <a className="contact-button facebook" href={contact.facebook} target="_blank" rel="noopener noreferrer">
               <Icon name="send" />
-              Tìm Facebook
+              {pageContent.contactSection.facebookLabel}
             </a>
-            <a className="contact-button phone" href={`tel:${CONTACT.phone}`}>
+            <a className="contact-button phone" href={`tel:${contact.phone}`}>
               <Icon name="phoneCall" />
-              0812 333 067
+              {contact.phone}
             </a>
           </div>
         </section>
       </main>
 
-      {quickContactVisible ? <MobileContactBar /> : null}
+      {quickContactVisible ? <MobileContactBar content={pageContent} /> : null}
 
       <footer className="footer">
-        <p>© 2026 findrooms.vn - Khải hỗ trợ tìm phòng trọ khu Nam Sài Gòn.</p>
+        <p>{pageContent.footer.text}</p>
       </footer>
     </>
   );
 }
 
-function ListingCard({ listing, liked, onLike }) {
+function ListingCard({ content, listing, liked, onLike }) {
+  const contact = content.contact;
   const likes = getDisplayLikes(listing, liked);
 
   return (
@@ -470,27 +439,27 @@ function ListingCard({ listing, liked, onLike }) {
           <button
             className={`like-button ${liked ? "is-liked" : ""}`}
             type="button"
-            aria-label={liked ? `Đã yêu thích ${listing.title}` : `Yêu thích ${listing.title}`}
+            aria-label={liked ? `${content.listings.likedLabel} ${listing.title}` : `${content.listings.likeLabel} ${listing.title}`}
             disabled={liked}
             onClick={onLike}
           >
             <Icon name="heart" />
-            Yêu thích
+            {content.listings.likeLabel}
           </button>
         </div>
         <div className="card-actions">
           <a
             className="message-link"
-            href={`${CONTACT.zalo}?text=${contactMessage(listing)}`}
+            href={`${contact.zalo}?text=${contactMessage(listing, contact)}`}
             target="_blank"
             rel="noopener noreferrer"
           >
             <Icon name="message" />
-            Nhắn tin
+            {content.listings.messageLabel}
           </a>
-          <a className="contact-link" href={`tel:${CONTACT.phone}`}>
+          <a className="contact-link" href={`tel:${contact.phone}`}>
             <Icon name="phone" />
-            Liên hệ
+            {content.listings.contactLabel}
           </a>
         </div>
       </div>
@@ -498,49 +467,51 @@ function ListingCard({ listing, liked, onLike }) {
   );
 }
 
-function MobileContactBar() {
+function MobileContactBar({ content }) {
+  const contact = content.contact;
+
   return (
-    <div className="mobile-contact-bar" aria-label="Liên hệ nhanh">
-      <a href={CONTACT.zalo} target="_blank" rel="noopener noreferrer">
+    <div className="mobile-contact-bar" aria-label={content.mobileContact.ariaLabel}>
+      <a href={contact.zalo} target="_blank" rel="noopener noreferrer">
         <Icon name="message" />
-        Zalo
+        {content.mobileContact.zaloLabel}
       </a>
-      <a href={`tel:${CONTACT.phone}`}>
+      <a href={`tel:${contact.phone}`}>
         <Icon name="phoneCall" />
-        Gọi
+        {content.mobileContact.callLabel}
       </a>
-      <a href={CONTACT.facebook} target="_blank" rel="noopener noreferrer">
+      <a href={contact.facebook} target="_blank" rel="noopener noreferrer">
         <Icon name="send" />
-        Facebook
+        {content.mobileContact.facebookLabel}
       </a>
     </div>
   );
 }
 
-function HeroListingPreview() {
+function HeroListingPreview({ preview }) {
   return (
     <aside className="hero-preview" aria-label="Phòng gợi ý nổi bật">
-      <div className="floating-badge">Phòng mới cập nhật</div>
+      <div className="floating-badge">{preview.badge}</div>
       <div className="preview-frame">
         <div className="preview-image">
-          <img src="/rooms/room-2.svg" alt="Studio full nội thất, ban công thoáng" />
+          <img src={preview.image} alt={preview.imageAlt} />
         </div>
         <div className="preview-body">
           <div className="preview-title-row">
-            <h2>Studio full nội thất, ban công thoáng</h2>
-            <strong>6,5tr</strong>
+            <h2>{preview.title}</h2>
+            <strong>{preview.price}</strong>
           </div>
           <p>
             <Icon name="pin" />
-            Quận 7 - gần Nguyễn Thị Thập
+            {preview.location}
           </p>
           <p>
             <Icon name="eye" />
-            1.248 lượt xem · 86 yêu thích
+            {preview.socialProof}
           </p>
           <p>
             <Icon name="home" />
-            Trống sẵn · Có thể xem phòng trong ngày
+            {preview.status}
           </p>
         </div>
       </div>

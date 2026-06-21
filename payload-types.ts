@@ -87,8 +87,12 @@ export interface Config {
     defaultIDType: string;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    'website-content': WebsiteContent;
+  };
+  globalsSelect: {
+    'website-content': WebsiteContentSelect<false> | WebsiteContentSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -324,6 +328,294 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "website-content".
+ */
+export interface WebsiteContent {
+  id: string;
+  seo: {
+    title: string;
+    description: string;
+    siteName: string;
+    url: string;
+  };
+  brand: {
+    name: string;
+    tagline: string;
+  };
+  contact: {
+    name: string;
+    phone: string;
+    zalo: string;
+    facebook: string;
+  };
+  navigation?:
+    | {
+        label: string;
+        href: string;
+        id?: string | null;
+      }[]
+    | null;
+  subNavigation?:
+    | {
+        label: string;
+        href: string;
+        id?: string | null;
+      }[]
+    | null;
+  header: {
+    callLabel: string;
+    zaloLabel: string;
+  };
+  hero: {
+    title: string;
+    highlightedTitle: string;
+    copy: string;
+    primaryLabel: string;
+    secondaryLabel: string;
+    phoneLabel: string;
+    stats?:
+      | {
+          value: string;
+          label: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  preview: {
+    badge: string;
+    image: string;
+    imageAlt: string;
+    title: string;
+    price: string;
+    location: string;
+    socialProof: string;
+    status: string;
+  };
+  filters: {
+    title: string;
+    copy: string;
+    resetLabel: string;
+    keywordLabel: string;
+    keywordPlaceholder: string;
+    priceLabel: string;
+    districtLabel: string;
+    typeLabel: string;
+    statusLabel: string;
+    searchLabel: string;
+    quickFiltersLabel: string;
+    priceRanges?:
+      | {
+          label: string;
+          value: string;
+          low: number;
+          high: number;
+          id?: string | null;
+        }[]
+      | null;
+    quickFilters?:
+      | {
+          label: string;
+          group: 'district' | 'type' | 'status' | 'price';
+          value: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  trustStrip?:
+    | {
+        value: string;
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  listings: {
+    title: string;
+    resultPrefix: string;
+    resultSuffix: string;
+    sortLabel: string;
+    emptyTitle: string;
+    emptyCopy: string;
+    likeLabel: string;
+    likedLabel: string;
+    messageLabel: string;
+    contactLabel: string;
+  };
+  contactSection: {
+    eyebrow: string;
+    title: string;
+    copy: string;
+    zaloLabel: string;
+    facebookLabel: string;
+  };
+  mobileContact: {
+    ariaLabel: string;
+    zaloLabel: string;
+    callLabel: string;
+    facebookLabel: string;
+  };
+  footer: {
+    text: string;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "website-content_select".
+ */
+export interface WebsiteContentSelect<T extends boolean = true> {
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        siteName?: T;
+        url?: T;
+      };
+  brand?:
+    | T
+    | {
+        name?: T;
+        tagline?: T;
+      };
+  contact?:
+    | T
+    | {
+        name?: T;
+        phone?: T;
+        zalo?: T;
+        facebook?: T;
+      };
+  navigation?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+        id?: T;
+      };
+  subNavigation?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+        id?: T;
+      };
+  header?:
+    | T
+    | {
+        callLabel?: T;
+        zaloLabel?: T;
+      };
+  hero?:
+    | T
+    | {
+        title?: T;
+        highlightedTitle?: T;
+        copy?: T;
+        primaryLabel?: T;
+        secondaryLabel?: T;
+        phoneLabel?: T;
+        stats?:
+          | T
+          | {
+              value?: T;
+              label?: T;
+              id?: T;
+            };
+      };
+  preview?:
+    | T
+    | {
+        badge?: T;
+        image?: T;
+        imageAlt?: T;
+        title?: T;
+        price?: T;
+        location?: T;
+        socialProof?: T;
+        status?: T;
+      };
+  filters?:
+    | T
+    | {
+        title?: T;
+        copy?: T;
+        resetLabel?: T;
+        keywordLabel?: T;
+        keywordPlaceholder?: T;
+        priceLabel?: T;
+        districtLabel?: T;
+        typeLabel?: T;
+        statusLabel?: T;
+        searchLabel?: T;
+        quickFiltersLabel?: T;
+        priceRanges?:
+          | T
+          | {
+              label?: T;
+              value?: T;
+              low?: T;
+              high?: T;
+              id?: T;
+            };
+        quickFilters?:
+          | T
+          | {
+              label?: T;
+              group?: T;
+              value?: T;
+              id?: T;
+            };
+      };
+  trustStrip?:
+    | T
+    | {
+        value?: T;
+        label?: T;
+        id?: T;
+      };
+  listings?:
+    | T
+    | {
+        title?: T;
+        resultPrefix?: T;
+        resultSuffix?: T;
+        sortLabel?: T;
+        emptyTitle?: T;
+        emptyCopy?: T;
+        likeLabel?: T;
+        likedLabel?: T;
+        messageLabel?: T;
+        contactLabel?: T;
+      };
+  contactSection?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        copy?: T;
+        zaloLabel?: T;
+        facebookLabel?: T;
+      };
+  mobileContact?:
+    | T
+    | {
+        ariaLabel?: T;
+        zaloLabel?: T;
+        callLabel?: T;
+        facebookLabel?: T;
+      };
+  footer?:
+    | T
+    | {
+        text?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
