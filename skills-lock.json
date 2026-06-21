@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "skills": {
+    "code-review": {
+      "source": "alinaqi/claude-bootstrap",
+      "sourceType": "github",
+      "skillPath": "skills/code-review/SKILL.md",
+      "computedHash": "a0712bf79012ea2bbefa5894f498e91ff342422e08e40a9b3969c1bf6c2bbe70"
+    },
+    "playwright-testing": {
+      "source": "laurigates/claude-plugins",
+      "sourceType": "github",
+      "skillPath": "testing-plugin/skills/playwright-testing/SKILL.md",
+      "computedHash": "4a6080dc91718e15956ad6d4091032d10bac4c3534657ada75438b0ae9bd572c"
+    },
+    "react-nextjs-development": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "github",
+      "skillPath": "skills/react-nextjs-development/SKILL.md",
+      "computedHash": "f6fccc099580762dc1ffe48d8462c9183f14225a6dd28679cb56a0e5b011669a"
+    },
+    "software-ui-ux-design": {
+      "source": "vasilyu1983/ai-agents-public",
+      "sourceType": "github",
+      "skillPath": "frameworks/shared-skills/skills/software-ui-ux-design/SKILL.md",
+      "computedHash": "013f1cdabfe69adff44f888498f9b634512668bf61b969abde53fc1dfd02c72e"
+    }
+  }
+}
