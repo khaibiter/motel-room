@@ -535,10 +535,6 @@ function ListingCard({ listing, liked, onLike }) {
 
         <div className="spec-grid">
           <div>
-            <span>Diện tích</span>
-            <strong>{listing.area}</strong>
-          </div>
-          <div>
             <span>Nội thất</span>
             <strong>{listing.furniture}</strong>
           </div>
