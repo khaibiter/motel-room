@@ -4,6 +4,10 @@ out
 dist
 .env*
 !.env.example
+payload.db*
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

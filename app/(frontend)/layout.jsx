@@ -1,5 +1,5 @@
 import { Be_Vietnam_Pro } from "next/font/google";
-import "./globals.css";
+import "../globals.css";
 
 const beVietnam = Be_Vietnam_Pro({
   subsets: ["vietnamese"],

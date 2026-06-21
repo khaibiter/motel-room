@@ -2,15 +2,30 @@
   "name": "findrooms",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "packageManager": "yarn@1.22.22",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "payload": "payload",
+    "generate:importmap": "payload generate:importmap"
   },
   "dependencies": {
+    "@payloadcms/db-mongodb": "^3.85.1",
+    "@payloadcms/next": "^3.85.1",
+    "@payloadcms/richtext-lexical": "^3.85.1",
+    "graphql": "^17.0.1",
     "next": "16.2.9",
+    "payload": "^3.85.1",
     "react": "19.2.7",
-    "react-dom": "19.2.7"
+    "react-dom": "19.2.7",
+    "sharp": "^0.35.2"
+  },
+  "devDependencies": {
+    "@types/node": "^26.0.0",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^6.0.3"
   }
 }

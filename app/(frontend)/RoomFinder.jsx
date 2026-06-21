@@ -9,99 +9,6 @@ const CONTACT = {
   facebook: "https://www.facebook.com/search/top?q=0812333067",
 };
 
-const listings = [
-  {
-    id: 1,
-    title: "Duplex ban công gần Nguyễn Tất Thành",
-    district: "Quận 4",
-    type: "Duplex",
-    status: "Trống sẵn",
-    price: 8.5,
-    area: "32m²",
-    furniture: "Cơ bản",
-    address: "Đường Tôn Đản, Quận 4",
-    desc: "Gác cao thoáng, cửa sổ lớn, nội thất cơ bản, di chuyển nhanh sang Quận 1.",
-    views: 128,
-    likes: 24,
-    image: "/rooms/room-1.svg",
-  },
-  {
-    id: 2,
-    title: "Studio full nội thất gần Lotte Mart",
-    district: "Quận 7",
-    type: "Studio",
-    status: "Sắp trống",
-    price: 7.2,
-    area: "28m²",
-    furniture: "Full nội thất",
-    address: "Đường Nguyễn Thị Thập, Quận 7",
-    desc: "Có bếp riêng, máy giặt chung, hầm xe rộng, phù hợp người đi làm.",
-    views: 96,
-    likes: 18,
-    image: "/rooms/room-2.svg",
-  },
-  {
-    id: 3,
-    title: "Studio cửa sổ lớn khu Phạm Hùng",
-    district: "Quận 8",
-    type: "Studio",
-    status: "Trống sẵn",
-    price: 5.8,
-    area: "24m²",
-    furniture: "Cơ bản",
-    address: "Đường Phạm Hùng, Quận 8",
-    desc: "Phòng sáng, có thang máy, giờ giấc tự do, gần siêu thị và trạm xe buýt.",
-    views: 211,
-    likes: 35,
-    image: "/rooms/room-3.svg",
-  },
-  {
-    id: 4,
-    title: "Duplex mới xây gần Phú Mỹ Hưng",
-    district: "Nhà Bè",
-    type: "Duplex",
-    status: "Trống sẵn",
-    price: 9.6,
-    area: "38m²",
-    furniture: "Máy lạnh, tủ, bếp",
-    address: "Đường Nguyễn Hữu Thọ, Nhà Bè",
-    desc: "Không gian rộng, có ban công, máy lạnh, tủ bếp, thuận tiện đi Quận 7.",
-    views: 174,
-    likes: 29,
-    image: "/rooms/room-4.svg",
-  },
-  {
-    id: 5,
-    title: "Studio yên tĩnh gần cầu Kênh Tẻ",
-    district: "Quận 4",
-    type: "Studio",
-    status: "Đã thuê",
-    price: 6.4,
-    area: "25m²",
-    furniture: "Nội thất gọn",
-    address: "Đường Khánh Hội, Quận 4",
-    desc: "Khu an ninh, nội thất gọn, phù hợp một người hoặc cặp đôi.",
-    views: 83,
-    likes: 12,
-    image: "/rooms/room-5.svg",
-  },
-  {
-    id: 6,
-    title: "Duplex nội thất cao cấp khu Him Lam",
-    district: "Quận 7",
-    type: "Duplex",
-    status: "Sắp trống",
-    price: 10,
-    area: "40m²",
-    furniture: "Cao cấp",
-    address: "Đường D1 Him Lam, Quận 7",
-    desc: "Thiết kế hiện đại, bếp tách mùi, gần Crescent Mall và khu văn phòng.",
-    views: 245,
-    likes: 41,
-    image: "/rooms/room-6.svg",
-  },
-];
-
 const filterGroups = {
   district: ["Tất cả", "Quận 4", "Quận 7", "Quận 8", "Nhà Bè"],
   type: ["Tất cả", "Duplex", "Studio"],
@@ -144,7 +51,8 @@ function getDisplayLikes(listing, liked) {
   return listing.likes + (liked ? 1 : 0);
 }
 
-export default function HomePage() {
+export default function RoomFinder({ listings }) {
+  const listingItems = useMemo(() => (Array.isArray(listings) ? listings : []), [listings]);
   const [keyword, setKeyword] = useState("");
   const [priceRange, setPriceRange] = useState("4-10");
   const [sortBy, setSortBy] = useState("featured");
@@ -171,7 +79,7 @@ export default function HomePage() {
     const normalizedKeyword = keyword.trim().toLowerCase();
     const [low, high] = priceRanges[priceRange] ?? priceRanges["4-10"];
 
-    const matched = listings.filter((listing) => {
+    const matched = listingItems.filter((listing) => {
       const haystack = `${listing.title} ${listing.district} ${listing.address} ${listing.desc} ${listing.type} ${listing.status}`.toLowerCase();
       const matchesKeyword = !normalizedKeyword || haystack.includes(normalizedKeyword);
       const matchesPrice = listing.price >= low && listing.price <= high;
@@ -189,7 +97,7 @@ export default function HomePage() {
       if (sortBy === "likes-desc") return getDisplayLikes(b, liked[b.id]) - getDisplayLikes(a, liked[a.id]);
       return b.views + b.likes - (a.views + a.likes);
     });
-  }, [filters, keyword, liked, priceRange, sortBy]);
+  }, [filters, keyword, liked, listingItems, priceRange, sortBy]);
 
   function updateFilter(group, value) {
     setFilters((current) => ({ ...current, [group]: value }));
