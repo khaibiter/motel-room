@@ -19,8 +19,7 @@
     "next": "16.2.9",
     "payload": "^3.85.1",
     "react": "19.2.7",
-    "react-dom": "19.2.7",
-    "sharp": "^0.35.2"
+    "react-dom": "19.2.7"
   },
   "devDependencies": {
     "@types/node": "^26.0.0",

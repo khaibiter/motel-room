@@ -3,7 +3,6 @@ import { fileURLToPath } from "node:url";
 import { mongooseAdapter } from "@payloadcms/db-mongodb";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { buildConfig } from "payload";
-import sharp from "sharp";
 import { Rooms } from "./collections/Rooms.js";
 import { Users } from "./collections/Users.js";
 
@@ -28,7 +27,6 @@ export default buildConfig({
   }),
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || developmentSecret,
-  sharp,
   typescript: {
     outputFile: path.resolve(dirname, "payload-types.ts"),
   },
