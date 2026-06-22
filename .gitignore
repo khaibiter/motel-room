@@ -5,6 +5,7 @@ dist
 .env*
 !.env.example
 payload.db*
+media/
 *.sqlite
 *.sqlite-shm
 *.sqlite-wal

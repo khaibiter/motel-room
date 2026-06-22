@@ -33,6 +33,22 @@ function getPriceRangeMap(ranges) {
   return Object.fromEntries(ranges.map((range) => [range.value, [Number(range.low), Number(range.high)]]));
 }
 
+function normalizeDisplayMedia(item, fallbackAlt = "") {
+  if (typeof item === "string") {
+    return {
+      alt: fallbackAlt,
+      type: /\.(mp4|mov|m4v|webm|ogg)(\?|#|$)/i.test(item) ? "video" : "image",
+      url: item,
+    };
+  }
+
+  return {
+    alt: item?.alt || fallbackAlt,
+    type: item?.type === "video" ? "video" : "image",
+    url: item?.url || "",
+  };
+}
+
 export default function RoomFinder({ content, listings }) {
   const pageContent = useMemo(() => normalizeSiteContent(content), [content]);
   const contact = pageContent.contact;
@@ -44,6 +60,8 @@ export default function RoomFinder({ content, listings }) {
   const [sortBy, setSortBy] = useState("featured");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [quickContactVisible, setQuickContactVisible] = useState(false);
+  const [selectedListing, setSelectedListing] = useState(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [filters, setFilters] = useState({
     district: "Tất cả",
     type: "Tất cả",
@@ -60,6 +78,26 @@ export default function RoomFinder({ content, listings }) {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (!selectedListing) {
+      return undefined;
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        setSelectedListing(null);
+      }
+    }
+
+    document.body.classList.add("modal-open");
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.classList.remove("modal-open");
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedListing]);
 
   const filteredListings = useMemo(() => {
     const normalizedKeyword = keyword.trim().toLowerCase();
@@ -116,6 +154,15 @@ export default function RoomFinder({ content, listings }) {
 
   function closeMobileMenu() {
     setMobileMenuOpen(false);
+  }
+
+  function openListingDetails(listing) {
+    setSelectedListing(listing);
+    setSelectedImageIndex(0);
+  }
+
+  function closeListingDetails() {
+    setSelectedListing(null);
   }
 
   return (
@@ -331,6 +378,7 @@ export default function RoomFinder({ content, listings }) {
                   listing={listing}
                   liked={Boolean(liked[listing.id])}
                   content={pageContent}
+                  onOpen={() => openListingDetails(listing)}
                   onLike={() => setLiked((current) => ({ ...current, [listing.id]: true }))}
                 />
               ))}
@@ -369,6 +417,19 @@ export default function RoomFinder({ content, listings }) {
 
       {quickContactVisible ? <MobileContactBar content={pageContent} /> : null}
 
+      {selectedListing ? (
+        <ListingDetailModal
+          contact={contact}
+          content={pageContent}
+          imageIndex={selectedImageIndex}
+          liked={Boolean(liked[selectedListing.id])}
+          listing={selectedListing}
+          onClose={closeListingDetails}
+          onImageChange={setSelectedImageIndex}
+          onLike={() => setLiked((current) => ({ ...current, [selectedListing.id]: true }))}
+        />
+      ) : null}
+
       <footer className="footer">
         <p>{pageContent.footer.text}</p>
       </footer>
@@ -376,16 +437,21 @@ export default function RoomFinder({ content, listings }) {
   );
 }
 
-function ListingCard({ content, listing, liked, onLike }) {
+function ListingCard({ content, listing, liked, onLike, onOpen }) {
   const contact = content.contact;
   const likes = getDisplayLikes(listing, liked);
 
   return (
     <article className="listing-card">
+      <button className="card-open-overlay" type="button" aria-label={`Xem chi tiết ${listing.title}`} onClick={onOpen} />
       <div className="listing-photo">
         <img src={listing.image} alt={listing.title} loading="lazy" />
         <span className="type-badge">{listing.type}</span>
         <span className={`status-badge ${statusClass(listing.status)}`}>{listing.status}</span>
+        <span className="gallery-count">
+          <Icon name="image" />
+          {(listing.gallery?.length || 1).toLocaleString("vi-VN")} media
+        </span>
         <div className="photo-stats">
           <span>
             <Icon name="eye" />
@@ -467,6 +533,141 @@ function ListingCard({ content, listing, liked, onLike }) {
   );
 }
 
+function ListingDetailModal({ contact, content, imageIndex, liked, listing, onClose, onImageChange, onLike }) {
+  const mediaItems = (listing.gallery?.length ? listing.gallery : [listing.image])
+    .map((item) => normalizeDisplayMedia(item, listing.title))
+    .filter((item) => item.url);
+  const galleryItems = mediaItems.length ? mediaItems : [{ alt: listing.title, type: "image", url: listing.image }];
+  const activeMedia = galleryItems[imageIndex] || galleryItems[0];
+  const likes = getDisplayLikes(listing, liked);
+
+  function stopModalClose(event) {
+    event.stopPropagation();
+  }
+
+  return (
+    <div className="listing-modal-backdrop" role="presentation" onClick={onClose}>
+      <section className="listing-modal" role="dialog" aria-modal="true" aria-labelledby="listing-detail-title" onClick={stopModalClose}>
+        <button className="modal-close" type="button" aria-label="Đóng chi tiết phòng" onClick={onClose}>
+          <Icon name="x" />
+        </button>
+
+        <div className="modal-gallery">
+          <div className="modal-main-photo">
+            <GalleryMedia media={activeMedia} title={listing.title} index={imageIndex} />
+            <span className={`status-badge ${statusClass(listing.status)}`}>{listing.status}</span>
+          </div>
+
+          <div className="modal-thumbnails" aria-label="Ảnh và video chi tiết phòng">
+            {galleryItems.map((media, index) => (
+              <button
+                className={`thumbnail-button ${index === imageIndex ? "is-active" : ""}`}
+                key={`${media.url}-${index}`}
+                type="button"
+                aria-label={`Xem ${media.type === "video" ? "video" : "ảnh"} ${index + 1} của ${listing.title}`}
+                onClick={() => onImageChange(index)}
+              >
+                <GalleryThumbnail media={media} />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="modal-content">
+          <div className="modal-title-row">
+            <div>
+              <p className="modal-eyebrow">{listing.type} tại {listing.district}</p>
+              <h2 id="listing-detail-title">{listing.title}</h2>
+            </div>
+            <strong>{formatPrice(listing.price)}</strong>
+          </div>
+
+          <p className="modal-address">
+            <Icon name="pin" />
+            {listing.address}
+          </p>
+
+          <div className="modal-spec-grid">
+            <div>
+              <span>Diện tích</span>
+              <strong>{listing.area}</strong>
+            </div>
+            <div>
+              <span>Nội thất</span>
+              <strong>{listing.furniture}</strong>
+            </div>
+            <div>
+              <span>Dạng phòng</span>
+              <strong>{listing.type}</strong>
+            </div>
+            <div>
+              <span>Trạng thái</span>
+              <strong>{listing.status}</strong>
+            </div>
+          </div>
+
+          <p className="modal-desc">{listing.desc}</p>
+
+          <div className="modal-stats">
+            <span>
+              <Icon name="eye" />
+              {listing.views.toLocaleString("vi-VN")} lượt xem
+            </span>
+            <span>
+              <Icon name="heart" />
+              {likes} yêu thích
+            </span>
+            <button
+              className={`like-button ${liked ? "is-liked" : ""}`}
+              type="button"
+              aria-label={liked ? `${content.listings.likedLabel} ${listing.title}` : `${content.listings.likeLabel} ${listing.title}`}
+              disabled={liked}
+              onClick={onLike}
+            >
+              <Icon name="heart" />
+              {content.listings.likeLabel}
+            </button>
+          </div>
+
+          <div className="modal-actions">
+            <a className="message-link" href={`${contact.zalo}?text=${contactMessage(listing, contact)}`} target="_blank" rel="noopener noreferrer">
+              <Icon name="message" />
+              {content.listings.messageLabel}
+            </a>
+            <a className="contact-link" href={`tel:${contact.phone}`}>
+              <Icon name="phone" />
+              {content.listings.contactLabel}
+            </a>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function GalleryMedia({ index, media, title }) {
+  if (media.type === "video") {
+    return <video src={media.url} controls playsInline preload="metadata" aria-label={`${title} - video ${index + 1}`} />;
+  }
+
+  return <img src={media.url} alt={media.alt || `${title} - ảnh ${index + 1}`} />;
+}
+
+function GalleryThumbnail({ media }) {
+  if (media.type === "video") {
+    return (
+      <span className="video-thumbnail">
+        <video src={media.url} muted playsInline preload="metadata" aria-hidden="true" />
+        <span className="play-badge">
+          <Icon name="play" />
+        </span>
+      </span>
+    );
+  }
+
+  return <img src={media.url} alt="" />;
+}
+
 function MobileContactBar({ content }) {
   const contact = content.contact;
 
@@ -545,6 +746,13 @@ function Icon({ name }) {
         <path d="M9 20v-6h6v6" />
       </>
     ),
+    image: (
+      <>
+        <rect width="18" height="18" x="3" y="3" rx="2" />
+        <circle cx="9" cy="9" r="2" />
+        <path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21" />
+      </>
+    ),
     menu: (
       <>
         <path d="M4 6h16" />
@@ -583,6 +791,7 @@ function Icon({ name }) {
         <circle cx="12" cy="10" r="3" />
       </>
     ),
+    play: <path d="m8 5 11 7-11 7Z" />,
     ruler: (
       <>
         <path d="m16 2 6 6L8 22l-6-6Z" />

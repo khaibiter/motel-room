@@ -63,11 +63,30 @@ export const Rooms = {
       label: "Description",
     },
     {
+      name: "photo",
+      type: "upload",
+      relationTo: "media",
+      admin: {
+        description: "Ảnh đại diện hiển thị ngoài danh sách. Nếu để trống, website sẽ dùng đường dẫn ảnh fallback bên dưới.",
+      },
+    },
+    {
+      name: "gallery",
+      type: "upload",
+      label: "Gallery ảnh / video",
+      relationTo: "media",
+      hasMany: true,
+      displayPreview: true,
+      admin: {
+        description: "Không bắt buộc. Chọn nhiều ảnh hoặc video tùy phòng; các media này chỉ hiện khi khách nhấn xem chi tiết.",
+      },
+    },
+    {
       name: "image",
       type: "text",
       defaultValue: "/rooms/room-1.svg",
       admin: {
-        description: "Đường dẫn ảnh public, ví dụ /rooms/room-1.svg.",
+        description: "Ảnh fallback dạng URL/path public, ví dụ /rooms/room-1.svg.",
       },
     },
     {

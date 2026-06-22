@@ -15,7 +15,7 @@ async function getRoomListings() {
     const payload = await getPayload({ config: configPromise });
     const result = await payload.find({
       collection: "rooms",
-      depth: 0,
+      depth: 1,
       limit: 100,
       pagination: false,
       sort: "-views",
