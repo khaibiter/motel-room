@@ -54,7 +54,11 @@ const hasSupabaseStorageEnv = Boolean(
 );
 
 function getSupabasePublicURL({ filename, prefix }) {
-  const pathParts = [roomImagePrefix, prefix, filename]
+  const prefixParts = String(prefix || "").split("/").filter(Boolean);
+  const pathParts = [
+    ...(prefixParts[0] === roomImagePrefix ? prefixParts : [roomImagePrefix, ...prefixParts]),
+    filename,
+  ]
     .filter(Boolean)
     .flatMap((part) => String(part).split("/").filter(Boolean))
     .map(encodeURIComponent);
@@ -84,6 +88,7 @@ export default buildConfig({
       bucket: supabaseStorageBucket,
       collections: {
         media: {
+          disablePayloadAccessControl: true,
           generateFileURL: hasSupabaseStorageEnv ? getSupabasePublicURL : undefined,
           prefix: roomImagePrefix,
         },
